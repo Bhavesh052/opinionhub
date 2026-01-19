@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { QuestionType, SurveyStatus } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 const UpdateSurveySchema = z.object({
     id: z.string(),
@@ -198,7 +199,7 @@ export const updateSurveyFull = async (values: z.infer<typeof UpdateSurveyFullSc
         return { success: "Survey updated successfully!" };
 
     } catch (e) {
-        console.error("Update Full Error", e);
+        logger.error("Update Full Error", e);
         return { error: "Failed to update survey" };
     }
 };
@@ -211,7 +212,7 @@ export const getSurvey = async (surveyId: string) => {
     });
     return survey;
     } catch (error) {
-        console.error("Get Survey Error", error);
+        logger.error("Get Survey Error", error);
         return null;
     }
 }

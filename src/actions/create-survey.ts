@@ -4,6 +4,7 @@ import * as z from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { QuestionType } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 const QuestionSchema = z.object({
     text: z.string().min(1, "Question text is required"),
@@ -60,7 +61,7 @@ export const createSurvey = async (values: z.infer<typeof CreateSurveySchema>) =
 
         return { success: "Survey created!", surveyId: survey.id };
     } catch (error) {
-        console.error("Failed to create survey:", error);
+        logger.error("Failed to create survey:", error);
         return { error: "Something went wrong!" };
     }
 };

@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 
 export const submitResponse = async (surveyId: string, answers: Record<string, any>) => {
@@ -50,7 +51,7 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
         return { success: "Survey submitted successfully!" };
 
     } catch (e) {
-        console.error(e);
+        logger.error(e);
         return { error: "Failed to submit survey." };
     }
 };
@@ -68,7 +69,7 @@ export const getSurveyResponses = async (surveyId: string) => {
         });
         return responses;
     } catch (error) {
-        console.error("Get Survey Responses Error", error);
+        logger.error("Get Survey Responses Error", error);
         return [{ data: {} }]
     }
 }
@@ -85,7 +86,7 @@ export const checkResponse = async(surveyId:string,participantId:string) => {
     });
     return response;
     } catch (error) {
-        console.error("Check response error",error);
+        logger.error("Check response error",error);
         return null;
     }
 }

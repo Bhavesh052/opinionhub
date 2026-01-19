@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { logger } from "@/lib/logger";
 export const getUserRole = async(id:string) => {
     try {
        const role= await db.user.findUnique({
@@ -7,7 +8,7 @@ export const getUserRole = async(id:string) => {
     });
     return role;
     } catch (error) {
-        console.error("Get User Role Error", error);
+        logger.error("Get User Role Error", error);
         return null;
     }
 }
