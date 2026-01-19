@@ -18,7 +18,7 @@ import { QuestionType } from "@prisma/client";
 const QuestionSchema = z.object({
     text: z.string().min(1, "Question text is required"),
     type: z.nativeEnum(QuestionType),
-    required: z.boolean().default(true),
+    required: z.boolean(),
     optionsString: z.string().optional(),
 });
 
@@ -27,11 +27,12 @@ export const AddQuestionForm = ({ surveyId }: { surveyId: string }) => {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
+
     const form = useForm<z.infer<typeof QuestionSchema>>({
         resolver: zodResolver(QuestionSchema),
         defaultValues: {
             text: "",
-            type: "TEXT",
+            type: QuestionType.TEXT,
             required: true,
             optionsString: "",
         },

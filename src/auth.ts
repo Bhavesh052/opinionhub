@@ -16,6 +16,7 @@ export const {
       }
 
       if (token.role && session.user) {
+        //@ts-ignore
         session.user.role = token.role as "SURVEYOR" | "PARTICIPANT"
       }
 
