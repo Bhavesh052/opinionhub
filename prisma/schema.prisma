@@ -1,0 +1,77 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SURVEYOR
+  PARTICIPANT
+}
+
+enum QuestionType {
+  SINGLE_SELECT
+  MULTI_SELECT
+  TEXT
+  LONG_TEXT
+}
+
+enum SurveyStatus {
+   DRAFT
+   ACTIVE
+   COMPLETE
+}
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      Role     @default(PARTICIPANT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdSurveys Survey[]
+  responses      Response[]
+}
+
+model Survey {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id])
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  limit       Int      @default(0)
+  status      SurveyStatus @default(DRAFT)
+  questions   Question[]
+  responses   Response[]
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  surveyId    String
+  survey      Survey       @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  type        QuestionType
+  text        String
+  options     Json?        // For select types: ["Option A", "Option B"]
+  required    Boolean      @default(true)
+  order       Int          @default(0)
+}
+
+model Response {
+  id            String   @id @default(cuid())
+  surveyId      String
+  survey        Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  participantId String
+  participant   User     @relation(fields: [participantId], references: [id])
+  createdAt     DateTime @default(now())
+  data          Json     @default("{}")
+  @@unique([surveyId, participantId]) // One response per participant
+}
+
+
