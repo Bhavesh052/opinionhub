@@ -23,6 +23,20 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
     if (existing) {
         return { error: "You have already filled this survey." };
     }
+    const responseCount = await db.survey.findUnique({
+        where: { id: surveyId },
+        select: {
+            limit: true,
+            _count: {
+                select: { responses: true },
+            },
+        }
+    });
+
+    if (responseCount?._count.responses == responseCount?.limit) {
+        return { error: "Survey limit reached." };
+    }
+
 
     try {
         await db.response.create({
