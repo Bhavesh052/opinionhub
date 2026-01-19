@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { SurveyFillForm } from "@/components/survey/survey-fill-form";
 import { Navbar } from "@/components/layout/navbar";
 import { getSurvey } from "@/actions/survey";
-import { checkResponse } from "@/actions/submit-survey";
+import { checkResponse } from "@/actions/response";
 
 export default async function SurveyPage({ params }: { params: { surveyId: string } }) {
     const session = await auth();
