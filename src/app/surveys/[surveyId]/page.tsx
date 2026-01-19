@@ -1,8 +1,9 @@
 import { auth } from "@/auth";
-import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { SurveyFillForm } from "@/components/survey/survey-fill-form";
 import { Navbar } from "@/components/layout/navbar";
+import { getSurvey } from "@/actions/survey";
+import { checkResponse } from "@/actions/submit-survey";
 
 export default async function SurveyPage({ params }: { params: { surveyId: string } }) {
     const session = await auth();
@@ -10,10 +11,7 @@ export default async function SurveyPage({ params }: { params: { surveyId: strin
         redirect(`/auth/login?callbackUrl=/surveys/${params.surveyId}`);
     }
     const { surveyId } = await params;
-    const survey = await db.survey.findUnique({
-        where: { id: surveyId },
-        include: { questions: true }
-    });
+    const survey = await getSurvey(surveyId);
 
     if (!survey || survey.status !== "ACTIVE") {
         return (
@@ -26,14 +24,7 @@ export default async function SurveyPage({ params }: { params: { surveyId: strin
     }
 
     // Check if already submitted
-    const existingResponse = await db.response.findUnique({
-        where: {
-            surveyId_participantId: {
-                surveyId: survey.id,
-                participantId: session.user.id!
-            }
-        }
-    });
+    const existingResponse = await checkResponse(surveyId, session.user.id!);
 
     if (existingResponse) {
         return (

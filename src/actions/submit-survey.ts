@@ -54,3 +54,38 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
         return { error: "Failed to submit survey." };
     }
 };
+
+
+export const getSurveyResponses = async (surveyId: string) => {
+    try {
+        const responses = await db.response.findMany({
+            where: {
+                surveyId
+            },
+            select: {
+                data: true
+            }
+        });
+        return responses;
+    } catch (error) {
+        console.error("Get Survey Responses Error", error);
+        return [{ data: {} }]
+    }
+}
+
+export const checkResponse = async(surveyId:string,participantId:string) => {
+    try {
+        const response = await db.response.findUnique({
+        where: {
+            surveyId_participantId: {
+                surveyId,
+                participantId
+            }
+        }
+    });
+    return response;
+    } catch (error) {
+        console.error("Check response error",error);
+        return null;
+    }
+}

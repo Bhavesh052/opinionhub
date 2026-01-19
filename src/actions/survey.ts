@@ -202,3 +202,17 @@ export const updateSurveyFull = async (values: z.infer<typeof UpdateSurveyFullSc
         return { error: "Failed to update survey" };
     }
 };
+
+export const getSurvey = async (surveyId: string) => {
+    try {
+         const survey = await db.survey.findUnique({
+        where: { id: surveyId },
+        include: { questions:true } 
+    });
+    return survey;
+    } catch (error) {
+        console.error("Get Survey Error", error);
+        return null;
+    }
+}
+ 

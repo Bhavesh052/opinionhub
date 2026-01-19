@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Dashboard from "@/components/dashboard";
+import { getUserRole } from "@/actions/user";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -10,10 +11,7 @@ export default async function DashboardPage() {
         redirect("/auth/login");
     }
 
-    const user = await db.user.findUnique({
-        where: { id: session.user.id },
-        select: { role: true }
-    });
+    const user = await getUserRole(session.user.id);
 
     if (!user) redirect("/auth/login");
 
