@@ -11,7 +11,7 @@ interface Survey {
   id: string
   title: string
   description: string
-  status: 'DRAFT' | 'ACTIVE' | 'COMPLETE'
+  status: 'DRAFT' | 'ACTIVE' | 'COMPLETED'
   questionCount: number
   responseCount: number
   createdAt: string
@@ -50,7 +50,7 @@ const MOCK_SURVEYS: Survey[] = [
     id: '4',
     title: 'Market Research 2024',
     description: 'Understanding consumer trends and preferences in our industry.',
-    status: 'COMPLETE',
+    status: 'COMPLETED',
     questionCount: 20,
     responseCount: 512,
     createdAt: '2023-12-20',
@@ -86,7 +86,7 @@ export default function SurveyList({ onSelectSurvey, onBack }: SurveyListProps) 
     switch (status) {
       case 'ACTIVE':
         return 'bg-green-100 text-green-800'
-      case 'COMPLETE':
+      case 'COMPLETED':
         return 'bg-blue-100 text-blue-800'
       case 'DRAFT':
         return 'bg-gray-100 text-gray-800'
@@ -131,7 +131,7 @@ export default function SurveyList({ onSelectSurvey, onBack }: SurveyListProps) 
           </div>
 
           <div className="flex gap-2">
-            {['ALL', 'ACTIVE', 'COMPLETE'].map((status) => (
+            {['ALL', 'ACTIVE', 'COMPLETED'].map((status) => (
               <Button
                 key={status}
                 variant={filterStatus === status ? 'default' : 'outline'}
