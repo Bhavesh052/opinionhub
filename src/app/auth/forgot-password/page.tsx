@@ -1,9 +1,12 @@
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { Suspense } from "react";
 
 const ForgotPasswordPage = () => {
     return (
         <div className="flex items-center justify-center h-screen">
-        <ForgotPasswordForm />
+            <Suspense fallback={<div>Loading...</div>}>
+                <ForgotPasswordForm />
+            </Suspense>
         </div>
     );
 }

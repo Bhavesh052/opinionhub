@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useState, useTransition, useEffect, Suspense } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { AuthFormShell } from "@/components/auth/auth-form-shell";
@@ -82,26 +82,24 @@ export const ForgotPasswordForm = () => {
             success={success}
             buttonLabel="Send Reset Code"
         >
-            <Suspense fallback={<div>Loading...</div>}>
-                <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                                <Input
-                                    {...field}
-                                    disabled={isPending}
-                                    placeholder="john.doe@example.com"
-                                    type="email"
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-            </Suspense>
+            <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="john.doe@example.com"
+                                type="email"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
         </AuthFormShell>
     );
 };
