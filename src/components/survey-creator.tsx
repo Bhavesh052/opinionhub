@@ -17,7 +17,7 @@ import { ArrowLeft, Plus, Trash2, Eye, Save, Loader2, Send } from 'lucide-react'
 import { createSurvey } from '@/actions/create-survey'
 import { updateSurveyFull } from '@/actions/survey'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner' 
+import { toast } from 'sonner'
 
 interface Question {
     id: string
@@ -444,6 +444,20 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                                                             }}
                                                             disabled={isPending}
                                                         />
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => {
+                                                                const newOptions = selectedQuestion.options?.filter((_, index) => index !== i)
+                                                                updateQuestion(selectedQuestion.id, {
+                                                                    options: newOptions,
+                                                                })
+                                                            }}
+                                                            disabled={isPending || selectedQuestion.options?.length === 1}
+                                                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
                                                     </div>
                                                 ))}
                                                 <Button
