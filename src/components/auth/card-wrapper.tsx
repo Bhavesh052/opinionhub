@@ -22,7 +22,12 @@ export const CardWrapper = ({
     return (
         <Card className="w-[400px] shadow-md">
             <CardHeader>
-                <div className="w-full flex flex-col gap-y-1 items-center justify-center">
+                <div className="w-full flex flex-col gap-y-2 items-center justify-center">
+                    <img
+                        src="/logo.svg"
+                        alt="OpinionHub Logo"
+                        className="w-24 h-24 -mb-8 object-contain"
+                    />
                     <h1 className="text-3xl font-semibold">{title}</h1>
                     <p className="text-muted-foreground text-sm">{headerLabel}</p>
                 </div>

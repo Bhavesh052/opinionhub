@@ -1,7 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from "recharts";
+
+const COLORS = ["#3b82f6", "#6366f1", "#8b5cf6", "#ec4899", "#f43f5e", "#f59e0b", "#10b981"];
 
 interface AnalyticsViewProps {
     questions: any[];
@@ -53,11 +55,36 @@ export const AnalyticsView = ({ questions, answers }: AnalyticsViewProps) => {
                             {type === "chart" && (data as any[]).length > 0 ? (
                                 <div className="h-[300px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={data as any[]}>
-                                            <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                                            <YAxis fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-                                            <Tooltip />
-                                            <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                        <BarChart
+                                            data={data as any[]}
+                                            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                            <XAxis
+                                                dataKey="name"
+                                                fontSize={12}
+                                                tickLine={false}
+                                                axisLine={{ stroke: "#e2e8f0" }}
+                                                tick={{ fill: "#64748b" }}
+                                                dy={10}
+                                            />
+                                            <YAxis
+                                                fontSize={12}
+                                                tickLine={false}
+                                                axisLine={false}
+                                                allowDecimals={false}
+                                                tick={{ fill: "#64748b" }}
+                                                domain={[0, 'auto']}
+                                            />
+                                            <Tooltip
+                                                cursor={{ fill: 'transparent' }}
+                                                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                            />
+                                            <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={45}>
+                                                {(data as any[]).map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Bar>
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>

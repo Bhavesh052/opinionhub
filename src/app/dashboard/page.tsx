@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Dashboard from "@/components/dashboard";
+import { getUserRole } from "@/actions/user";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -10,10 +11,7 @@ export default async function DashboardPage() {
         redirect("/auth/login");
     }
 
-    const user = await db.user.findUnique({
-        where: { id: session.user.id },
-        select: { role: true }
-    });
+    const user = await getUserRole(session.user.id);
 
     if (!user) redirect("/auth/login");
 
@@ -28,8 +26,16 @@ export default async function DashboardPage() {
             include: { _count: { select: { responses: true } } }
         });
     } else {
+        const answeredSurveyIds = await db.response.findMany({
+            where: { participantId: session.user.id },
+            select: { surveyId: true }
+        }).then(responses => responses.map(r => r.surveyId));
+
         surveys = await db.survey.findMany({
-            where: { status: "ACTIVE" },
+            where: {
+                status: "ACTIVE",
+                id: { notIn: answeredSurveyIds }
+            },
             orderBy: { createdAt: "desc" },
             include: { _count: { select: { responses: true } } }
         });

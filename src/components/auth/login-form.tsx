@@ -4,12 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState, useTransition } from "react";
-import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 
-import { CardWrapper } from "@/components/auth/card-wrapper";
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import {
-    Form,
     FormControl,
     FormField,
     FormItem,
@@ -18,7 +15,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { login } from "@/actions/login"; 
+import { login } from "@/actions/login";
+import Link from "next/link";
 
 const LoginSchema = z.object({
     email: z.string().email({ message: "Email is required" }),
@@ -50,67 +48,64 @@ export const LoginForm = () => {
     };
 
     return (
-        <CardWrapper
-            title="Login"
-            headerLabel="Welcome back"
+        <AuthFormShell
+            title="Opinion Hub"
+            headerLabel="Login"
             backButtonLabel="Don't have an account?"
             backButtonHref="/auth/register"
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            error={error}
+            success={success}
+            buttonLabel="Login"
         >
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="john.doe@example.com"
-                                            type="email"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="******"
-                                            type="password"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    {error && (
-                        <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive">
-                            <p>{error}</p>
-                        </div>
-                    )}
-                    {success && (
-                        <div className="bg-emerald-500/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-emerald-500">
-                            <p>{success}</p>
-                        </div>
-                    )}
-                    <Button disabled={isPending} type="submit" className="w-full">
-                        Login
-                    </Button>
-                </form>
-            </Form>
-        </CardWrapper>
+            <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="john.doe@example.com"
+                                type="email"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="******"
+                                type="password"
+                            />
+                        </FormControl>
+                        <Button
+                            size="sm"
+                            variant="link"
+                            asChild
+                            className="px-0 font-normal"
+                        >
+                            <Link href="/auth/forgot-password">
+                                Forgot password?
+                            </Link>
+                        </Button>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        </AuthFormShell>
     );
 };

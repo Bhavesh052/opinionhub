@@ -8,55 +8,34 @@ import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { ArrowLeft, Check } from 'lucide-react'
 
+interface Question {
+  id: string
+  type: 'SINGLE_SELECT' | 'MULTI_SELECT' | 'TEXT' | 'LONG_TEXT'
+  text: string
+  options?: any // Prisma Json type
+  required: boolean
+  order: number
+}
+
+interface Survey {
+  id: string
+  title: string
+  description: string | null
+  questions: Question[]
+}
+
 interface SurveyTakerProps {
-  surveyId: string
+  survey: Survey
+  onSubmit: (answers: Record<string, any>) => Promise<{ success?: string; error?: string }>
   onBack: () => void
 }
 
-// Mock survey data
-const MOCK_SURVEY = {
-  id: '1',
-  title: 'Customer Satisfaction Survey',
-  description: 'Help us improve by sharing your feedback on our products and services.',
-  questions: [
-    {
-      id: 'q1',
-      type: 'SINGLE_SELECT' as const,
-      text: 'How satisfied are you with our service?',
-      options: ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied'],
-      required: true,
-      order: 0,
-    },
-    {
-      id: 'q2',
-      type: 'MULTI_SELECT' as const,
-      text: 'Which features do you use the most? (Select all that apply)',
-      options: ['Feature A', 'Feature B', 'Feature C', 'Feature D'],
-      required: true,
-      order: 1,
-    },
-    {
-      id: 'q3',
-      type: 'TEXT' as const,
-      text: 'What is your primary use case?',
-      required: false,
-      order: 2,
-    },
-    {
-      id: 'q4',
-      type: 'LONG_TEXT' as const,
-      text: 'Please share any additional feedback or suggestions',
-      required: false,
-      order: 3,
-    },
-  ],
-}
-
-export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
-  const survey = MOCK_SURVEY
+export default function SurveyTaker({ survey, onSubmit, onBack }: SurveyTakerProps) {
   const [responses, setResponses] = useState<Record<string, any>>({})
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [currentQuestion, setCurrentQuestion] = useState(0)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const question = survey.questions[currentQuestion]
   const progress = ((currentQuestion + 1) / survey.questions.length) * 100
@@ -80,14 +59,27 @@ export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
     }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate required fields
     const allAnswered = survey.questions
       .filter((q) => q.required)
       .every((q) => responses[q.id] !== undefined && responses[q.id] !== '')
 
     if (allAnswered) {
-      setSubmitted(true)
+      setIsSubmitting(true)
+      setError(null)
+      try {
+        const result = await onSubmit(responses)
+        if (result.success) {
+          setSubmitted(true)
+        } else {
+          setError(result.error || "Failed to submit survey")
+        }
+      } catch (err) {
+        setError("An unexpected error occurred")
+      } finally {
+        setIsSubmitting(false)
+      }
     }
   }
 
@@ -135,10 +127,16 @@ export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
 
       <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12">
         <Card className="p-8 bg-card mb-8">
+          {error && (
+            <div className="mb-6 p-4 bg-destructive/10 text-destructive rounded-lg text-sm font-medium">
+              {error}
+            </div>
+          )}
+
           {currentQuestion === 0 && (
             <div className="mb-12">
               <h1 className="text-3xl font-bold text-foreground mb-2">{survey.title}</h1>
-              <p className="text-lg text-muted-foreground">{survey.description}</p>
+              {survey.description && <p className="text-lg text-muted-foreground">{survey.description}</p>}
             </div>
           )}
 
@@ -154,7 +152,7 @@ export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
             {/* Question Responses */}
             {question.type === 'SINGLE_SELECT' && (
               <div className="space-y-3">
-                {question.options?.map((option, i) => (
+                {question.options?.map((option: string, i: number) => (
                   <label
                     key={i}
                     className="flex items-center gap-3 p-4 border border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors"
@@ -175,7 +173,7 @@ export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
 
             {question.type === 'MULTI_SELECT' && (
               <div className="space-y-3">
-                {question.options?.map((option, i) => (
+                {question.options?.map((option: string, i: number) => (
                   <label
                     key={i}
                     className="flex items-center gap-3 p-4 border border-border rounded-lg cursor-pointer hover:bg-secondary/50 transition-colors"
@@ -240,6 +238,7 @@ export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
                 onClick={handleSubmit}
                 className="gap-2"
                 disabled={
+                  isSubmitting ||
                   survey.questions
                     .filter((q) => q.required)
                     .some(
@@ -249,8 +248,12 @@ export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
                     )
                 }
               >
-                <Check className="w-4 h-4" />
-                Submit Survey
+                {isSubmitting ? "Submitting..." : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Submit Survey
+                  </>
+                )}
               </Button>
             ) : (
               <Button
@@ -273,13 +276,12 @@ export default function SurveyTaker({ surveyId, onBack }: SurveyTakerProps) {
             <button
               key={q.id}
               onClick={() => setCurrentQuestion(i)}
-              className={`w-10 h-10 rounded-full font-semibold text-sm transition-colors ${
-                i === currentQuestion
-                  ? 'bg-primary text-primary-foreground'
-                  : i < currentQuestion
-                    ? 'bg-primary/30 text-primary'
-                    : 'bg-border text-muted-foreground'
-              }`}
+              className={`w-10 h-10 rounded-full font-semibold text-sm transition-colors ${i === currentQuestion
+                ? 'bg-primary text-primary-foreground'
+                : i < currentQuestion
+                  ? 'bg-primary/30 text-primary'
+                  : 'bg-border text-muted-foreground'
+                }`}
             >
               {i + 1}
             </button>
