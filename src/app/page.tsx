@@ -13,10 +13,10 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-primary-foreground" />
+              <div className="w-full flex flex-col gap-y-2 items-center justify-center">
+                <img src="/logo.svg" alt="Logo" className="w-20 h-20 mb-2 object-contain" />
               </div>
-              <span className="text-2xl font-bold text-foreground">Opinion Hub</span>
+              <span className="text-2xl font-bold text-foreground">OpinionHub</span>
             </div>
             <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>

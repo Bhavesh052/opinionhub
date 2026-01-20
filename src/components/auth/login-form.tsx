@@ -50,8 +50,8 @@ export const LoginForm = () => {
 
     return (
         <CardWrapper
-            title="Login"
-            headerLabel="Welcome back"
+            title="Opinion Hub"
+            headerLabel="Login"
             backButtonLabel="Don't have an account?"
             backButtonHref="/auth/register"
         >

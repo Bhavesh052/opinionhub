@@ -93,14 +93,13 @@ export default function Dashboard({ surveys, stats, isSurveyor }: DashboardProps
                 {isSurveyor ? (
                     <Card className="bg-card">
                         <Tabs defaultValue="all" className="w-full">
-                            <div className="border-b border-border p-6 w-fit">
+                            <div className="border-b border-border p-6 flex justify-center">
                                 <TabsList className="bg-muted">
-                                    <TabsTrigger value="all">All Surveys</TabsTrigger>
+                                    <TabsTrigger value="all">All</TabsTrigger>
                                     <TabsTrigger value="active">Active</TabsTrigger>
                                     <TabsTrigger value="draft">Drafts</TabsTrigger>
                                 </TabsList>
                             </div>
-
                             <TabsContent value="all" className="p-6">
                                 <SurveyGrid surveys={surveys} isSurveyor={true} />
                             </TabsContent>
