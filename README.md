@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🗳️ Opinion Hub
 
-## Getting Started
+Opinion Hub is a modern, elegant, and user-friendly survey platform designed to bridge the gap between surveyors and participants. Built with a focus on visual excellence and seamless user experience, it allows for the creation of diverse surveys and provides detailed analytics.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Dynamic Survey Creation**: Build surveys with multiple question types including single-select, multi-select, short text, and long text.
+- **Dual Roles**:
+  - **Surveyors**: Create, manage, and analyze surveys.
+  - **Participants**: Seamlessly fill out surveys with a clean, distraction-free interface.
+- **Real-time Analytics**: View survey responses and statistics at a glance.
+- **Responsive Design**: A premium, state-of-the-art interface that works beautifully on any device.
+- **Robust Security**: Authentication and role-based access control.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: [Next.js](https://nextjs.org/)
+- **Database**: [Prisma](https://www.prisma.io/) with PostgreSQL
+- **Styling**: Vanilla CSS & [shadcn/ui](https://ui.shadcn.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Email**: Nodemailer for OTP and notifications
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🏁 Getting Started
 
-## Learn More
+Follow these steps to get the project up and running on your local machine.
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Node.js](https://nodejs.org/) (Latest LTS version recommended)
+- [PostgreSQL](https://www.postgresql.org/) database
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
 
-## Deploy on Vercel
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Bhavesh052/opinionhub.git
+   cd opinionhub
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. **Set up Environment Variables**:
+   Create a `.env` file in the root directory and copy the contents from `env.example`. Fill in your database and SMTP details.
+   ```bash
+   cp env.example .env
+   ```
+
+4. **Initialize the Database**:
+   Run the Prisma migrations to set up your database schema.
+   ```bash
+   npx prisma migrate dev
+   ```
+
+### 🏃 Running the Application
+
+- **Development Mode**:
+  ```bash
+  npm run dev
+  ```
+  Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+- **Production Build**:
+  ```bash
+  npm run build
+  ```
+
+- **Start Production Server**:
+  ```bash
+  npm run start
+  ```
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+---
