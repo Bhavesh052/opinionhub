@@ -3,7 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import {
@@ -16,60 +17,94 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { login } from "@/actions/login";
-import Link from "next/link";
+import { resetPassword } from "@/actions/password-reset";
 
-const LoginSchema = z.object({
-    email: z.string().email({ message: "Email is required" }),
-    password: z.string().min(1, { message: "Password is required" }),
+const ResetPasswordSchema = z.object({
+    email: z.string().email(),
+    otp: z.string().length(6, { message: "OTP must be 6 digits" }),
+    password: z.string().min(6, { message: "Minimum 6 characters required" }),
+    token: z.string(),
 });
 
-export const LoginForm = () => {
+export const ResetPasswordForm = () => {
+    const searchParams = useSearchParams();
+    const router = useRouter();
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
     const [isPending, startTransition] = useTransition();
 
-    const form = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
+    const email = searchParams.get("email") || "";
+    const token = searchParams.get("token") || "";
+
+    const form = useForm<z.infer<typeof ResetPasswordSchema>>({
+        resolver: zodResolver(ResetPasswordSchema),
         defaultValues: {
-            email: "",
+            email,
+            otp: "",
             password: "",
+            token,
         },
     });
+    useEffect(() => {
+        if (email) form.setValue("email", email);
+        if (token) form.setValue("token", token);
+    }, [email, token, form]);
 
-    const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
         setError("");
         setSuccess("");
 
         startTransition(() => {
-            login(values).then((data) => {
-                setError(data?.error);
+            resetPassword(values).then((data) => {
+                if (data?.error) {
+                    setError(data.error);
+                } else {
+                    setSuccess(data?.success);
+                    setTimeout(() => {
+                        router.push("/auth/login");
+                    }, 3000);
+                }
             });
         });
     };
 
+    if (!email || !token) {
+        return (
+            <CardWrapper
+                title="Error"
+                headerLabel="Invalid reset link"
+                backButtonLabel="Go back"
+                backButtonHref="/auth/forgot-password"
+            >
+                <div className="text-center text-destructive p-4">
+                    The password reset session is invalid or missing. Please request a new code.
+                </div>
+            </CardWrapper>
+        );
+    }
+
     return (
         <CardWrapper
-            title="Login"
-            headerLabel="Welcome back"
-            backButtonLabel="Don't have an account?"
-            backButtonHref="/auth/register"
+            title="Reset Password"
+            headerLabel={`Enter the code sent to email}`}
+            backButtonLabel="Back to login"
+            backButtonHref="/auth/login"
         >
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <div className="space-y-4">
                         <FormField
                             control={form.control}
-                            name="email"
+                            name="otp"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel>6-Digit Code</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={isPending}
-                                            placeholder="john.doe@example.com"
-                                            type="email"
+                                            placeholder="123456"
+                                            maxLength={6}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -81,7 +116,7 @@ export const LoginForm = () => {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel>New Password</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
@@ -90,16 +125,6 @@ export const LoginForm = () => {
                                             type="password"
                                         />
                                     </FormControl>
-                                    <Button
-                                        size="sm"
-                                        variant="link"
-                                        asChild
-                                        className="px-0 font-normal"
-                                    >
-                                        <Link href="/auth/forgot-password">
-                                            Forgot password?
-                                        </Link>
-                                    </Button>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -116,7 +141,7 @@ export const LoginForm = () => {
                         </div>
                     )}
                     <Button disabled={isPending} type="submit" className="w-full">
-                        Login
+                        Reset Password
                     </Button>
                 </form>
             </Form>
