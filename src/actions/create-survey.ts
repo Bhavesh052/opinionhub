@@ -14,7 +14,7 @@ const QuestionSchema = z.object({
     order: z.number().int(),
 });
 
-const surveyStatus = z.enum(["DRAFT", "ACTIVE", "COMPLETE"]);
+const surveyStatus = z.enum(["DRAFT", "ACTIVE", "COMPLETED"]);
 
 const CreateSurveySchema = z.object({
     title: z.string().min(1, "Title is required"),

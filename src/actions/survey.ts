@@ -11,7 +11,6 @@ const UpdateSurveySchema = z.object({
     id: z.string(),
     title: z.string().min(1).optional(),
     description: z.string().optional(),
-    isActive: z.boolean().optional(),
     status: z.nativeEnum(SurveyStatus).optional(),
 });
 
@@ -217,3 +216,18 @@ export const getSurvey = async (surveyId: string) => {
     }
 }
  
+export const updateSurveyStatus = async(surveyId:string,status:SurveyStatus) => {
+    try {
+        await db.survey.update({
+            where: { id: surveyId },
+            data: { status }
+        });
+        revalidatePath(`/surveys/${surveyId}`);
+        revalidatePath(`/surveys/${surveyId}/edit`);
+        revalidatePath("/dashboard");
+        return { success: "Survey status updated" };
+    } catch (error) {
+        logger.error("Update Survey Status Error", error);
+        return { error: "Failed to update survey status" };
+    }
+}

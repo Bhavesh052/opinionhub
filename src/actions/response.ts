@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { SurveyStatus } from "@prisma/client";
+import { updateSurveyStatus } from "./survey";
 export const getResponseCount = async(surveyId:string) =>{
     try {
          const responseCount = await db.survey.findUnique({
@@ -58,10 +59,7 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
             }
         })
         if((responseCount?._count.responses as number)+1=== responseCount?.limit){
-            await db.survey.update({
-                where: { id: surveyId },
-                data: { status: SurveyStatus.COMPLETE },
-            });
+           await updateSurveyStatus(surveyId,SurveyStatus.COMPLETED);
         }
         revalidatePath(`/surveys/${surveyId}`);
         return { success: "Survey submitted successfully!" };

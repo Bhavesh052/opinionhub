@@ -12,10 +12,22 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreVertical, Users, BarChart3, Clock, Plus, Edit, FileText, Trash, ClipboardList, ArrowRight } from 'lucide-react'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { MoreVertical, Users, BarChart3, Clock, Plus, Edit, FileText, Trash, ClipboardList, ArrowRight, Check } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
-import { deleteSurvey } from '@/actions/survey'
+import { deleteSurvey, updateSurveyStatus } from '@/actions/survey'
+import { SurveyStatus } from '@prisma/client'
 
 interface Survey {
     id: string
@@ -40,9 +52,9 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ surveys, stats, isSurveyor }: DashboardProps) {
-    const activeSurveysList = surveys.filter(s => s.status === 'ACTIVE');
-    const completedSurveysList = surveys.filter(s => s.status === 'COMPLETED'); // Assuming 'COMPLETED' is a status
-    const draftSurveysList = surveys.filter(s => s.status === 'DRAFT');
+    const activeSurveysList = surveys.filter(s => s.status === SurveyStatus.ACTIVE);
+    const completedSurveysList = surveys.filter(s => s.status === SurveyStatus.COMPLETED);
+    const draftSurveysList = surveys.filter(s => s.status === SurveyStatus.DRAFT);
 
     return (
         <div className="min-h-screen bg-background">
@@ -98,6 +110,7 @@ export default function Dashboard({ surveys, stats, isSurveyor }: DashboardProps
                                     <TabsTrigger value="all">All</TabsTrigger>
                                     <TabsTrigger value="active">Active</TabsTrigger>
                                     <TabsTrigger value="draft">Drafts</TabsTrigger>
+                                    <TabsTrigger value="completed">Completed</TabsTrigger>
                                 </TabsList>
                             </div>
                             <TabsContent value="all" className="p-6">
@@ -110,6 +123,9 @@ export default function Dashboard({ surveys, stats, isSurveyor }: DashboardProps
 
                             <TabsContent value="draft" className="p-6">
                                 <SurveyGrid surveys={draftSurveysList} isSurveyor={true} />
+                            </TabsContent>
+                            <TabsContent value="completed" className="p-6">
+                                <SurveyGrid surveys={completedSurveysList} isSurveyor={true} />
                             </TabsContent>
                         </Tabs>
                     </Card>
@@ -157,7 +173,7 @@ function SurveyCard({ survey, isSurveyor }: { survey: Survey, isSurveyor?: boole
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            {survey.status==="DRAFT"&&(<DropdownMenuItem asChild>
+                            {survey.status === "DRAFT" && (<DropdownMenuItem asChild>
                                 <Link href={`/surveys/${survey.id}/edit`}>
                                     <Edit className="mr-2 h-4 w-4" /> Edit
                                 </Link>
@@ -167,6 +183,34 @@ function SurveyCard({ survey, isSurveyor }: { survey: Survey, isSurveyor?: boole
                                     <BarChart3 className="mr-2 h-4 w-4" /> Results
                                 </Link>
                             </DropdownMenuItem>
+                            {survey.status === SurveyStatus.ACTIVE && (
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                            <Check className="mr-2 h-4 w-4" /> Complete
+                                        </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This will mark the survey as complete. No more responses will be accepted.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction
+                                                onClick={async () => {
+                                                    await updateSurveyStatus(survey.id, SurveyStatus.COMPLETED);
+                                                }}
+                                                className="bg-primary hover:bg-primary/90"
+                                            >
+                                                Yes, Complete
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            )}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                                 variant="destructive"
@@ -195,9 +239,9 @@ function SurveyCard({ survey, isSurveyor }: { survey: Survey, isSurveyor?: boole
                             </Badge>
                             {isSurveyor && (
                                 <Badge
-                                    className={`${survey.status === 'ACTIVE'
+                                    className={`${survey.status === SurveyStatus.ACTIVE
                                         ? 'bg-green-500/10 text-green-600 border-green-500/20 shadow-none'
-                                        : survey.status === 'COMPLETED'
+                                        : survey.status === SurveyStatus.COMPLETED
                                             ? 'bg-blue-500/10 text-blue-600 border-blue-500/20 shadow-none'
                                             : 'bg-muted text-muted-foreground border-border shadow-none'
                                         }`}
