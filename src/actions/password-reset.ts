@@ -14,8 +14,12 @@ const ResetPasswordSchema = z.object({
     email: z.string().email(),
     otp: z.string().length(6),
     password: z.string().min(6),
-    token: z.string(), // The verification JWT
-});
+    token: z.string(), 
+     confirmPassword: z.string().min(6, { message: "Minimum 6 characters required" }),
+    }).refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ["confirmPassword"],
+    });
 
 export const requestPasswordReset = async (values: z.infer<typeof ForgotPasswordSchema>) => {
     const validatedFields = ForgotPasswordSchema.safeParse(values);
