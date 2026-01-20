@@ -4,6 +4,24 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
+import { SurveyStatus } from "@prisma/client";
+export const getResponseCount = async(surveyId:string) =>{
+    try {
+         const responseCount = await db.survey.findUnique({
+        where: { id: surveyId },
+        select: {
+            limit: true,
+            _count: {
+                select: { responses: true },
+            },
+        }
+    });
+    return responseCount;
+    } catch (error) {
+        logger.error(`Error occured while fetching response count ${error}`);
+        return null;
+    }
+}
 
 export const submitResponse = async (surveyId: string, answers: Record<string, any>) => {
     const session = await auth();
@@ -24,16 +42,8 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
     if (existing) {
         return { error: "You have already filled this survey." };
     }
-    const responseCount = await db.survey.findUnique({
-        where: { id: surveyId },
-        select: {
-            limit: true,
-            _count: {
-                select: { responses: true },
-            },
-        }
-    });
-
+   
+    const responseCount = await getResponseCount(surveyId);
     if (responseCount?._count.responses == responseCount?.limit) {
         return { error: "Survey limit reached." };
     }
@@ -47,6 +57,12 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
                 data: answers,
             }
         })
+        if((responseCount?._count.responses as number)+1=== responseCount?.limit){
+            await db.survey.update({
+                where: { id: surveyId },
+                data: { status: SurveyStatus.COMPLETE },
+            });
+        }
         revalidatePath(`/surveys/${surveyId}`);
         return { success: "Survey submitted successfully!" };
 
