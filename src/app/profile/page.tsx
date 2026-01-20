@@ -5,9 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Shield, Calendar } from "lucide-react";
+import { User, Mail, Shield, Calendar, KeyRound } from "lucide-react";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function ProfilePage() {
     const session = await auth();
@@ -74,6 +76,25 @@ export default async function ProfilePage() {
                                 <p className="text-sm text-muted-foreground">
                                     {dbUser?.createdAt ? format(new Date(dbUser.createdAt), "MMMM do, yyyy") : "N/A"}
                                 </p>
+                            </div>
+                        </div>
+
+                        <Separator className="my-6" />
+
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <KeyRound className="h-5 w-5 text-primary" />
+                                Security
+                            </h3>
+                            <div className="p-4 rounded-lg bg-primary/5 border border-primary/10">
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    To change your password, we will send a verification code to your registered email address.
+                                </p>
+                                <Button asChild variant="outline" className="w-full">
+                                    <Link href={`/auth/forgot-password?email=${user.email}`}>
+                                        Change Password
+                                    </Link>
+                                </Button>
                             </div>
                         </div>
                     </CardContent>

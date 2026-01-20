@@ -86,7 +86,7 @@ export const ResetPasswordForm = () => {
     return (
         <CardWrapper
             title="Reset Password"
-            headerLabel={`Enter the code sent to email}`}
+            headerLabel={`Enter the code sent to ${email}`}
             backButtonLabel="Back to login"
             backButtonHref="/auth/login"
         >
