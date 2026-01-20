@@ -6,9 +6,9 @@ import * as z from "zod";
 import { useState, useTransition, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import {
-    Form,
     FormControl,
     FormField,
     FormItem,
@@ -24,11 +24,11 @@ const ResetPasswordSchema = z.object({
     otp: z.string().length(6, { message: "OTP must be 6 digits" }),
     password: z.string().min(6, { message: "Minimum 6 characters required" }),
     token: z.string(),
-     confirmPassword: z.string().min(6, { message: "Minimum 6 characters required" }),
-    }).refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ["confirmPassword"],
-    });
+    confirmPassword: z.string().min(6, { message: "Minimum 6 characters required" }),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+});
 
 
 export const ResetPasswordForm = () => {
@@ -90,85 +90,72 @@ export const ResetPasswordForm = () => {
     }
 
     return (
-        <CardWrapper
+        <AuthFormShell
             title="Reset Password"
             headerLabel={`Enter the code sent to ${email}`}
             backButtonLabel="Back to login"
             backButtonHref="/auth/login"
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            error={error}
+            success={success}
+            buttonLabel="Reset Password"
         >
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="otp"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>6-Digit Code</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="123456"
-                                            maxLength={6}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>New Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="******"
-                                            type="password"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Confirm Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="******"
-                                            type="password"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    {error && (
-                        <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive">
-                            <p>{error}</p>
-                        </div>
-                    )}
-                    {success && (
-                        <div className="bg-emerald-500/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-emerald-500">
-                            <p>{success}</p>
-                        </div>
-                    )}
-                    <Button disabled={isPending} type="submit" className="w-full">
-                        Reset Password
-                    </Button>
-                </form>
-            </Form>
-        </CardWrapper>
+            <FormField
+                control={form.control}
+                name="otp"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>6-Digit Code</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="123456"
+                                maxLength={6}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="******"
+                                type="password"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="******"
+                                type="password"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        </AuthFormShell>
     );
 };

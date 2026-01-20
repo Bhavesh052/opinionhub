@@ -6,9 +6,8 @@ import * as z from "zod";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { CardWrapper } from "@/components/auth/card-wrapper";
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import {
-    Form,
     FormControl,
     FormField,
     FormItem,
@@ -62,85 +61,72 @@ export const ChangePasswordForm = () => {
     };
 
     return (
-        <CardWrapper
+        <AuthFormShell
             title="Change Password"
             headerLabel="Securely update your password"
             backButtonLabel="Back to profile"
             backButtonHref="/profile"
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            error={error}
+            success={success}
+            buttonLabel="Update Password"
         >
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="currentPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Current Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="******"
-                                            type="password"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="newPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>New Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="******"
-                                            type="password"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Confirm Password</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={isPending}
-                                            placeholder="******"
-                                            type="password"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    {error && (
-                        <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive">
-                            <p>{error}</p>
-                        </div>
-                    )}
-                    {success && (
-                        <div className="bg-emerald-500/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-emerald-500">
-                            <p>{success}</p>
-                        </div>
-                    )}
-                    <Button disabled={isPending} type="submit" className="w-full">
-                        Update Password
-                    </Button>
-                </form>
-            </Form>
-        </CardWrapper>
+            <FormField
+                control={form.control}
+                name="currentPassword"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Current Password</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="******"
+                                type="password"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="******"
+                                type="password"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                            <Input
+                                {...field}
+                                disabled={isPending}
+                                placeholder="******"
+                                type="password"
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        </AuthFormShell>
     );
 };

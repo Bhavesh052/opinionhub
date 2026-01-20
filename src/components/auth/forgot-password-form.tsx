@@ -6,9 +6,8 @@ import * as z from "zod";
 import { useState, useTransition, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { CardWrapper } from "@/components/auth/card-wrapper";
+import { AuthFormShell } from "@/components/auth/auth-form-shell";
 import {
-    Form,
     FormControl,
     FormField,
     FormItem,
@@ -71,51 +70,38 @@ export const ForgotPasswordForm = () => {
     };
 
     return (
-        <CardWrapper
+        <AuthFormShell
             title="Forgot Password"
             headerLabel="Reset your password"
             backButtonLabel="Back to login"
             backButtonHref="/auth/login"
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            error={error}
+            success={success}
+            buttonLabel="Send Reset Code"
         >
             <Suspense fallback={<div>Loading...</div>}>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                disabled={isPending}
-                                                placeholder="john.doe@example.com"
-                                                type="email"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        {error && (
-                            <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive">
-                                <p>{error}</p>
-                            </div>
-                        )}
-                        {success && (
-                            <div className="bg-emerald-500/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-emerald-500">
-                                <p>{success}</p>
-                            </div>
-                        )}
-                        <Button disabled={isPending} type="submit" className="w-full">
-                            Send Reset Code
-                        </Button>
-                    </form>
-                </Form>
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <Input
+                                    {...field}
+                                    disabled={isPending}
+                                    placeholder="john.doe@example.com"
+                                    type="email"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
             </Suspense>
-        </CardWrapper>
+        </AuthFormShell>
     );
 };
