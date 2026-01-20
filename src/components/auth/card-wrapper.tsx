@@ -26,7 +26,7 @@ export const CardWrapper = ({
                     <img
                         src="/logo.svg"
                         alt="OpinionHub Logo"
-                        className="w-20 h-20 mb-2 object-contain"
+                        className="w-24 h-24 -mb-8 object-contain"
                     />
                     <h1 className="text-3xl font-semibold">{title}</h1>
                     <p className="text-muted-foreground text-sm">{headerLabel}</p>

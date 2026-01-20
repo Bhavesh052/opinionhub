@@ -6,18 +6,18 @@ import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 import { SurveyStatus } from "@prisma/client";
 import { updateSurveyStatus } from "./survey";
-export const getResponseCount = async(surveyId:string) =>{
+export const getResponseCount = async (surveyId: string) => {
     try {
-         const responseCount = await db.survey.findUnique({
-        where: { id: surveyId },
-        select: {
-            limit: true,
-            _count: {
-                select: { responses: true },
-            },
-        }
-    });
-    return responseCount;
+        const responseCount = await db.survey.findUnique({
+            where: { id: surveyId },
+            select: {
+                limit: true,
+                _count: {
+                    select: { responses: true },
+                },
+            }
+        });
+        return responseCount;
     } catch (error) {
         logger.error(`Error occured while fetching response count ${error}`);
         return null;
@@ -43,7 +43,7 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
     if (existing) {
         return { error: "You have already filled this survey." };
     }
-   
+
     const responseCount = await getResponseCount(surveyId);
     if (responseCount?._count.responses == responseCount?.limit) {
         return { error: "Survey limit reached." };
@@ -58,8 +58,8 @@ export const submitResponse = async (surveyId: string, answers: Record<string, a
                 data: answers,
             }
         })
-        if((responseCount?._count.responses as number)+1=== responseCount?.limit){
-           await updateSurveyStatus(surveyId,SurveyStatus.COMPLETED);
+        if ((responseCount?._count.responses as number) + 1 === responseCount?.limit) {
+            await updateSurveyStatus(surveyId, SurveyStatus.COMPLETED);
         }
         revalidatePath(`/surveys/${surveyId}`);
         return { success: "Survey submitted successfully!" };
@@ -88,19 +88,53 @@ export const getSurveyResponses = async (surveyId: string) => {
     }
 }
 
-export const checkResponse = async(surveyId:string,participantId:string) => {
+export const checkResponse = async (surveyId: string, participantId: string) => {
     try {
         const response = await db.response.findUnique({
-        where: {
-            surveyId_participantId: {
-                surveyId,
-                participantId
+            where: {
+                surveyId_participantId: {
+                    surveyId,
+                    participantId
+                }
             }
-        }
-    });
-    return response;
+        });
+        return response;
     } catch (error) {
-        logger.error("Check response error",error);
+        logger.error("Check response error", error);
         return null;
     }
 }
+
+export const getParticipantHistory = async () => {
+    const session = await auth();
+    if (!session?.user?.id) {
+        return { error: "Unauthorized" };
+    }
+
+    try {
+        const history = await db.response.findMany({
+            where: {
+                participantId: session.user.id
+            },
+            include: {
+                survey: {
+                    include: {
+                        questions: {
+                            orderBy: {
+                                order: 'asc'
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        return { history };
+    } catch (error) {
+        logger.error("Get Participant History Error", error);
+        return { error: "Failed to fetch history" };
+    }
+};

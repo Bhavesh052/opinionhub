@@ -23,7 +23,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { MoreVertical, Users, BarChart3, Clock, Plus, Edit, FileText, Trash, ClipboardList, ArrowRight, Check } from 'lucide-react'
+import { MoreVertical, Users, BarChart3, Clock, Plus, Edit, Trash, ClipboardList, ArrowRight, Check, History as HistoryIcon } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { deleteSurvey, updateSurveyStatus } from '@/actions/survey'
@@ -140,13 +140,25 @@ export default function Dashboard({ surveys, stats, isSurveyor }: DashboardProps
                         {activeSurveysList.length === 0 ? (
                             <Card className="p-12 text-center bg-card/50 border-dashed">
                                 <ClipboardList className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
-                                <p className="text-muted-foreground">No surveys available at the moment.</p>
+                                <p className="text-muted-foreground mb-4">No surveys available at the moment.</p>
+                                <Button asChild variant="outline">
+                                    <Link href="/history">
+                                        View Your History
+                                    </Link>
+                                </Button>
                             </Card>
                         ) : (
                             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                 {activeSurveysList.map((survey) => (
                                     <SurveyCard key={survey.id} survey={survey} />
                                 ))}
+                                <Link href="/history">
+                                    <Card className="flex flex-col items-center justify-center p-6 bg-primary/5 border-dashed border-primary/20 hover:bg-primary/10 transition-colors cursor-pointer group h-full">
+                                        <HistoryIcon className="w-12 h-12 text-primary/40 mb-4 group-hover:scale-110 transition-transform" />
+                                        <h3 className="font-semibold text-primary/80">View History</h3>
+                                        <p className="text-xs text-muted-foreground text-center mt-1">Check your past responses</p>
+                                    </Card>
+                                </Link>
                             </div>
                         )}
                     </div>

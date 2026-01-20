@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User } from "next-auth";
 import { logout } from "@/actions/logout";
-import { User as UserIcon, LogOut, LayoutDashboard } from "lucide-react";
+import { User as UserIcon, LogOut, LayoutDashboard, History as HistoryIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -61,6 +61,15 @@ export const UserNav = ({ user }: UserNavProps) => {
                             <span>Dashboard</span>
                         </Link>
                     </DropdownMenuItem>
+                    {/* @ts-ignore */}
+                    {user.role === "PARTICIPANT" && (
+                        <DropdownMenuItem asChild>
+                            <Link href="/history" className="cursor-pointer w-full flex items-center">
+                                <HistoryIcon className="mr-2 h-4 w-4" />
+                                <span>History</span>
+                            </Link>
+                        </DropdownMenuItem>
+                    )}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600">
