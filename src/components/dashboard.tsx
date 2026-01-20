@@ -12,7 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ArrowLeft, MoreVertical, Users, BarChart3, TrendingUp, Clock, Plus, Edit, FileText, Trash } from 'lucide-react'
+import { MoreVertical, Users, BarChart3, Clock, Plus, Edit, FileText, Trash, ClipboardList, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { deleteSurvey } from '@/actions/survey'
@@ -66,7 +66,7 @@ export default function Dashboard({ surveys, stats, isSurveyor }: DashboardProps
 
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
                 {/* Stats Overview */}
-                <div className="grid gap-6 mb-8 md:grid-cols-3">
+                {isSurveyor &&(<div className="grid gap-6 mb-8 md:grid-cols-3">
                     {[
                         { label: 'Total Surveys', value: stats.totalSurveys.toString(), icon: BarChart3 },
                         { label: 'Total Responses', value: stats.totalResponses.toString(), icon: Users },
@@ -87,35 +87,95 @@ export default function Dashboard({ surveys, stats, isSurveyor }: DashboardProps
                             </Card>
                         )
                     })}
-                </div>
+                </div>)}
 
-                {/* Surveys Table */}
-                <Card className="bg-card">
-                    <Tabs defaultValue="all" className="w-full">
-                        <div className="border-b border-border p-6">
-                            <TabsList className="bg-muted">
-                                <TabsTrigger value="all">All Surveys</TabsTrigger>
-                                <TabsTrigger value="active">Active</TabsTrigger>
-                                <TabsTrigger value="draft">Drafts</TabsTrigger>
-                                {/* Add more tabs if needed */}
-                            </TabsList>
+                {/* Surveys Content */}
+                {isSurveyor ? (
+                    <Card className="bg-card">
+                        <Tabs defaultValue="all" className="w-full">
+                            <div className="border-b border-border p-6">
+                                <TabsList className="bg-muted">
+                                    <TabsTrigger value="all">All Surveys</TabsTrigger>
+                                    <TabsTrigger value="active">Active</TabsTrigger>
+                                    <TabsTrigger value="draft">Drafts</TabsTrigger>
+                                </TabsList>
+                            </div>
+
+                            <TabsContent value="all" className="p-0">
+                                <SurveyTable surveys={surveys} />
+                            </TabsContent>
+
+                            <TabsContent value="active" className="p-0">
+                                <SurveyTable surveys={activeSurveysList} />
+                            </TabsContent>
+
+                            <TabsContent value="draft" className="p-0">
+                                <SurveyTable surveys={draftSurveysList} />
+                            </TabsContent>
+                        </Tabs>
+                    </Card>
+                ) : (
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-semibold text-foreground">Available Surveys</h2>
+                            <Badge variant="secondary" className="px-3 py-1">
+                                {activeSurveysList.length} Active
+                            </Badge>
                         </div>
-
-                        <TabsContent value="all" className="p-0">
-                            <SurveyTable surveys={surveys} />
-                        </TabsContent>
-
-                        <TabsContent value="active" className="p-0">
-                            <SurveyTable surveys={activeSurveysList} />
-                        </TabsContent>
-
-                        <TabsContent value="draft" className="p-0">
-                            <SurveyTable surveys={draftSurveysList} />
-                        </TabsContent>
-                    </Tabs>
-                </Card>
+                        {activeSurveysList.length === 0 ? (
+                            <Card className="p-12 text-center bg-card/50 border-dashed">
+                                <ClipboardList className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+                                <p className="text-muted-foreground">No surveys available at the moment.</p>
+                            </Card>
+                        ) : (
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                {activeSurveysList.map((survey) => (
+                                    <SurveyCard key={survey.id} survey={survey} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
             </main>
         </div>
+    )
+}
+
+function SurveyCard({ survey }: { survey: Survey }) {
+    return (
+        <Card className="group flex flex-col h-full bg-card hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 border-border/50 overflow-hidden">
+            <div className="p-6 flex-1">
+                <div className="flex items-start justify-between mb-4">
+                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <ClipboardList className="w-5 h-5" />
+                    </div>
+                    <Badge variant="outline" className="text-[10px] uppercase tracking-wider">
+                        {formatDistanceToNow(new Date(survey.createdAt), { addSuffix: true })}
+                    </Badge>
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                    {survey.title}
+                </h3>
+                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                    Participate in this survey and share your valuable feedback with us.
+                    {/* Could add a real description here if available in Survey object */}
+                </p>
+                <div className="flex items-center gap-4 py-4 border-t border-border/50">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Users className="w-3.5 h-3.5" />
+                        <span>{survey._count.responses} responses</span>
+                    </div>
+                </div>
+            </div>
+            <div className="p-4 bg-muted/30 border-t border-border/50">
+                <Button asChild className="w-full group/btn" variant="default">
+                    <Link href={`/surveys/${survey.id}/take`}>
+                        Take Survey
+                        <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                    </Link>
+                </Button>
+            </div>
+        </Card>
     )
 }
 

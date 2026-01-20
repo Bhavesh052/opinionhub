@@ -4,8 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState, useTransition } from "react";
-import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
 
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import {
