@@ -22,8 +22,16 @@ export const {
 
       return session
     },
-    async jwt({ token }) {
+    async jwt({ token, user }) {
       if (!token.sub) return token
+
+      if (user) {
+        //@ts-ignore
+        token.role = user.role
+        return token
+      }
+
+      if (token.role) return token
 
       const existingUser = await db.user.findUnique({
         where: { id: token.sub }
