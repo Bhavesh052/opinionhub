@@ -98,7 +98,46 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
         )
     }
 
+    const validateSurvey = () => {
+        if (!title.trim()) {
+            toast.error("Survey title is required");
+            return false;
+        }
+
+        if (questions.length === 0) {
+            toast.error("At least one question is required");
+            return false;
+        }
+
+        for (const [index, question] of questions.entries()) {
+            if (!question.text.trim()) {
+                toast.error(`Question ${index + 1} text is required`);
+                setSelectedQuestionId(question.id);
+                return false;
+            }
+
+            if (['SINGLE_SELECT', 'MULTI_SELECT'].includes(question.type)) {
+                if (!question.options || question.options.length === 0) {
+                    toast.error(`Question ${index + 1} must have at least one option`);
+                    setSelectedQuestionId(question.id);
+                    return false;
+                }
+
+                for (const [optIndex, option] of question.options.entries()) {
+                    if (!option.trim()) {
+                        toast.error(`Option ${optIndex + 1} in question ${index + 1} cannot be empty`);
+                        setSelectedQuestionId(question.id);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     const handleSave = () => {
+        if (!validateSurvey()) return;
         startTransition(async () => {
             const payloadQuestions = questions.map((q, index) => ({
                 id: initialData?.questions.some((iq: any) => iq.id === q.id) ? q.id : undefined,
@@ -142,6 +181,7 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
     };
 
     const handlePublish = () => {
+        if (!validateSurvey()) return;
         startTransition(async () => {
             const payloadQuestions = questions.map((q, index) => ({
                 id: initialData?.questions.some((iq: any) => iq.id === q.id) ? q.id : undefined,

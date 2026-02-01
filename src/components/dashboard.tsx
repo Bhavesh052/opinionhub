@@ -185,11 +185,11 @@ function SurveyCard({ survey, isSurveyor }: { survey: Survey, isSurveyor?: boole
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            {survey.status === "DRAFT" && (<DropdownMenuItem asChild>
+                           <DropdownMenuItem asChild>
                                 <Link href={`/surveys/${survey.id}/edit`}>
                                     <Edit className="mr-2 h-4 w-4" /> Edit
                                 </Link>
-                            </DropdownMenuItem>)}
+                            </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href={`/surveys/${survey.id}/stats`}>
                                     <BarChart3 className="mr-2 h-4 w-4" /> Results
