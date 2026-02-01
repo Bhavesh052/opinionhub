@@ -110,6 +110,11 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
             return false;
         }
 
+        if (limit <= 0) {
+            toast.error("Limit must be greater than 0");
+            return false;
+        }
+
         for (const [index, question] of questions.entries()) {
             if (!question.text.trim()) {
                 toast.error(`Question ${index + 1} text is required`);
@@ -348,7 +353,7 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                                 <Eye className="w-4 h-4" />
                                 Preview
                             </Button>
-                            {initialData?.status === "DRAFT" && (
+                            {initialData?.status != "ACTIVE" && (
                                 <Button
                                     variant="outline"
                                     onClick={handleSave}
