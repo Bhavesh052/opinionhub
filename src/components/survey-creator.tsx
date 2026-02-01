@@ -35,6 +35,7 @@ interface SurveyCreatorProps {
         description?: string | null
         limit?: number
         questions: any[]
+        status: string
     }
 }
 
@@ -347,15 +348,16 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                                 <Eye className="w-4 h-4" />
                                 Preview
                             </Button>
-                            <Button
-                                variant="outline"
-                                onClick={handleSave}
-                                className="gap-2"
-                                disabled={isPending}
+                            {initialData?.status === "DRAFT" && (
+                                <Button
+                                    variant="outline"
+                                    onClick={handleSave}
+                                    className="gap-2"
+                                    disabled={isPending}
                             >
                                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                 Save Draft
-                            </Button>
+                            </Button>)}
                             <Button onClick={handlePublish} className="gap-2" disabled={isPending}>
                                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                                 Publish
