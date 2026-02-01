@@ -10,6 +10,7 @@ generator client {
 enum Role {
   SURVEYOR
   PARTICIPANT
+  ADMIN
 }
 
 enum QuestionType {
@@ -32,9 +33,11 @@ model User {
   role      Role     @default(PARTICIPANT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  demographics Json? @default("{}")
 
   createdSurveys Survey[]
   responses      Response[]
+  @@index([email])
 }
 
 model Survey {
@@ -47,8 +50,10 @@ model Survey {
   updatedAt   DateTime @default(now())
   limit       Int      @default(0)
   status      SurveyStatus @default(DRAFT)
+  targeting   Json?        @default("{}")
   questions   Question[]
   responses   Response[]
+  @@index([creatorId])
 }
 
 model Question {
@@ -71,6 +76,7 @@ model Response {
   createdAt     DateTime @default(now())
   data          Json     @default("{}")
   @@unique([surveyId, participantId]) // One response per participant
+  
+  @@index([id,surveyId])
+  @@index([id,participantId])
 }
-
-
