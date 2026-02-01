@@ -122,6 +122,7 @@ const UpdateSurveyFullSchema = z.object({
     description: z.string().optional(),
     limit: z.number().int().optional(),
     status: z.nativeEnum(SurveyStatus).optional(),
+    targeting: z.record(z.string(), z.any()).optional(),
     questions: z.array(QuestionUpdateSchema),
 });
 
@@ -205,18 +206,18 @@ export const updateSurveyFull = async (values: z.infer<typeof UpdateSurveyFullSc
 
 export const getSurvey = async (surveyId: string) => {
     try {
-         const survey = await db.survey.findUnique({
-        where: { id: surveyId },
-        include: { questions:true } 
-    });
-    return survey;
+        const survey = await db.survey.findUnique({
+            where: { id: surveyId },
+            include: { questions: true }
+        });
+        return survey;
     } catch (error) {
         logger.error("Get Survey Error", error);
         return null;
     }
 }
- 
-export const updateSurveyStatus = async(surveyId:string,status:SurveyStatus) => {
+
+export const updateSurveyStatus = async (surveyId: string, status: SurveyStatus) => {
     try {
         await db.survey.update({
             where: { id: surveyId },

@@ -36,6 +36,7 @@ interface SurveyCreatorProps {
         limit?: number
         questions: any[]
         status: string
+        targeting?: any
     }
 }
 
@@ -66,6 +67,7 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
             }]
     )
     const [previewMode, setPreviewMode] = useState(false)
+    const [targeting, setTargeting] = useState<Record<string, any>>(initialData?.targeting || {})
     const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>('1')
 
     const handleBack = () => {
@@ -139,6 +141,16 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
             }
         }
 
+        if (targeting.minAge !== undefined && targeting.minAge <= 0) {
+            toast.error("Min Age must be greater than 0");
+            return false;
+        }
+
+        if (targeting.minAnnualIncome !== undefined && targeting.minAnnualIncome <= 0) {
+            toast.error("Min Annual Income must be greater than 0");
+            return false;
+        }
+
         return true;
     }
 
@@ -161,6 +173,7 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                     description,
                     limit,
                     status: "DRAFT",
+                    targeting,
                     questions: payloadQuestions,
                 });
                 if (result.error) {
@@ -174,6 +187,7 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                     surveyStatus: "DRAFT",
                     description,
                     limit,
+                    targeting,
                     questions: payloadQuestions,
                 });
                 if (result.error) {
@@ -205,6 +219,7 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                     description,
                     limit,
                     status: "ACTIVE",
+                    targeting,
                     questions: payloadQuestions,
                 });
                 if (result.error) {
@@ -218,6 +233,7 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                     surveyStatus: "ACTIVE",
                     description,
                     limit,
+                    targeting,
                     questions: payloadQuestions,
                 });
                 if (result.error) {
@@ -359,10 +375,10 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                                     onClick={handleSave}
                                     className="gap-2"
                                     disabled={isPending}
-                            >
-                                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                Save Draft
-                            </Button>)}
+                                >
+                                    {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                    Save Draft
+                                </Button>)}
                             <Button onClick={handlePublish} className="gap-2" disabled={isPending}>
                                 {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                                 Publish
@@ -417,10 +433,55 @@ export default function SurveyCreator({ onBack, initialData }: SurveyCreatorProp
                                     </p>
                                 </div>
 
-                                <Button onClick={addQuestion} className="w-full gap-2" disabled={isPending}>
-                                    <Plus className="w-4 h-4" />
-                                    Add Question
-                                </Button>
+                                <div className="space-y-4 pt-4 border-t border-border">
+                                    <h3 className="text-sm font-semibold text-foreground">Targeting</h3>
+                                    <div className="space-y-2">
+                                        <div>
+                                            <label className="text-xs text-muted-foreground">Min Age</label>
+                                            <Input
+                                                type="number"
+                                                value={targeting.minAge || ''}
+                                                onChange={(e) => setTargeting({ ...targeting, minAge: Number(e.target.value) || undefined })}
+                                                placeholder="None"
+                                                className="h-8 text-xs"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-muted-foreground">Gender</label>
+                                            <Select
+                                                value={targeting.gender || 'ALL'}
+                                                onValueChange={(v) => setTargeting({ ...targeting, gender: v === 'ALL' ? undefined : v })}
+                                            >
+                                                <SelectTrigger className="h-8 text-xs">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="ALL">All Genders</SelectItem>
+                                                    <SelectItem value="MALE">Male</SelectItem>
+                                                    <SelectItem value="FEMALE">Female</SelectItem>
+                                                    <SelectItem value="OTHER">Other</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-muted-foreground">Min Annual Income</label>
+                                            <Input
+                                                type="number"
+                                                value={targeting.minAnnualIncome || ''}
+                                                onChange={(e) => setTargeting({ ...targeting, minAnnualIncome: Number(e.target.value) || undefined })}
+                                                placeholder="None"
+                                                className="h-8 text-xs"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 mt-4 border-t border-border">
+                                    <Button onClick={addQuestion} className="w-full gap-2" disabled={isPending}>
+                                        <Plus className="w-4 h-4" />
+                                        Add Question
+                                    </Button>
+                                </div>
                             </div>
                         </Card>
                     </div>

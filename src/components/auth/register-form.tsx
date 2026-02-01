@@ -16,12 +16,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { redirect } from 'next/navigation';
 
 const RegisterSchema = z.object({
     email: z.string().email(),
     password: z.string().min(6, { message: "Minimum 6 characters required" }),
     name: z.string().min(1, { message: "Name is required" }),
     role: z.enum(["SURVEYOR", "PARTICIPANT"]),
+    dob: z.string().optional(),
+    annualIncome: z.string().optional(),
+    gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
+}).refine((data) => {
+    if (data.role === "PARTICIPANT") {
+        return !!data.dob && !!data.gender && !!data.annualIncome;
+    }
+    return true;
+}, {
+    message: "All fields are required for participants",
+    path: ["role"],
 });
 
 export const RegisterForm = () => {
@@ -36,17 +55,29 @@ export const RegisterForm = () => {
             password: "",
             name: "",
             role: "SURVEYOR",
+            dob: "",
+            gender: undefined,
+            annualIncome: "",
         },
     });
+
+    const role = form.watch("role");
 
     const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
         setError("");
         setSuccess("");
 
         startTransition(() => {
-            register(values).then((data) => {
+            const payload = {
+                ...values,
+                annualIncome: values.annualIncome ? Number(values.annualIncome) : undefined,
+            };
+            register(payload).then((data) => {
                 setError(data.error);
                 setSuccess(data.success);
+                setTimeout(() => {
+                    redirect('/auth/login');
+                }, 1000);
             });
         });
     };
@@ -151,6 +182,74 @@ export const RegisterForm = () => {
                     </FormItem>
                 )}
             />
+            {role === "PARTICIPANT" && (
+                <>
+                    <FormField
+                        control={form.control}
+                        name="dob"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Date of Birth</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        disabled={isPending}
+                                        type="date"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="gender"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Gender</FormLabel>
+                                    <Select
+                                        disabled={isPending}
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select gender" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="MALE">Male</SelectItem>
+                                            <SelectItem value="FEMALE">Female</SelectItem>
+                                            <SelectItem value="OTHER">Other</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="annualIncome"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Annual Income</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            disabled={isPending}
+                                            placeholder="100000"
+                                            type="text"
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                </>
+            )}
         </AuthFormShell>
     );
 };

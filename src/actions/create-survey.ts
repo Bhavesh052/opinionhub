@@ -22,6 +22,7 @@ const CreateSurveySchema = z.object({
     questions: z.array(QuestionSchema),
     surveyStatus: surveyStatus.optional(),
     limit: z.number().int().optional(),
+    targeting: z.record(z.string(), z.any()).optional(),
 });
 
 export const createSurvey = async (values: z.infer<typeof CreateSurveySchema>) => {
@@ -37,7 +38,7 @@ export const createSurvey = async (values: z.infer<typeof CreateSurveySchema>) =
         return { error: "Invalid fields!" };
     }
 
-    const { title, description, questions, surveyStatus, limit } = validatedFields.data;
+    const { title, description, questions, surveyStatus, limit, targeting } = validatedFields.data;
 
     try {
         const survey = await db.survey.create({
@@ -47,6 +48,7 @@ export const createSurvey = async (values: z.infer<typeof CreateSurveySchema>) =
                 creatorId: session.user.id,
                 status: surveyStatus ?? "DRAFT",
                 limit: limit ?? 0,
+                targeting: targeting ?? {},
                 questions: {
                     create: questions.map((q) => ({
                         text: q.text,

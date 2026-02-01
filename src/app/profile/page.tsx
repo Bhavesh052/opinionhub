@@ -30,8 +30,10 @@ export default async function ProfilePage({
 
     const dbUser = await db.user.findUnique({
         where: { id: user.id },
-        select: { createdAt: true, role: true, name: true, email: true }
+        select: { createdAt: true, role: true, name: true, email: true, demographics: true }
     });
+
+    const demographics = (dbUser?.demographics as any) || {};
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -41,8 +43,11 @@ export default async function ProfilePage({
                     "use server";
                     const name = formData.get("name") as string;
                     const email = formData.get("email") as string;
+                    const gender = formData.get("gender") as string;
+                    const dob = formData.get("dob") as string;
+                    const annualIncome = formData.get("annualIncome") as string;
 
-                    const result = await updateProfile({ name, email });
+                    const result = await updateProfile({ name, email, gender, dob, annualIncome });
                     if (result.error) {
                         redirect(`/profile?edit=true&error=${encodeURIComponent(result.error)}`);
                     } else {
@@ -124,6 +129,63 @@ export default async function ProfilePage({
                                         {dbUser?.createdAt ? format(new Date(dbUser.createdAt), "MMMM do, yyyy") : "N/A"}
                                     </p>
                                 </div>
+                            </div>
+
+                            <Separator className="my-6" />
+
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold flex items-center gap-2">
+                                    <User className="h-5 w-5 text-primary" />
+                                    Demographics
+                                </h3>
+                                {isEditing ? (
+                                    <div className="grid gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Gender</label>
+                                            <select
+                                                name="gender"
+                                                defaultValue={demographics.gender || ""}
+                                                className="w-full p-2 rounded-md border bg-background"
+                                            >
+                                                <option value="">Select Gender</option>
+                                                <option value="MALE">Male</option>
+                                                <option value="FEMALE">Female</option>
+                                                <option value="OTHER">Other</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Date of Birth</label>
+                                            <Input
+                                                name="dob"
+                                                type="date"
+                                                defaultValue={demographics.dob || ""}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Annual Income</label>
+                                            <Input
+                                                name="annualIncome"
+                                                placeholder="e.g. $50,000"
+                                                defaultValue={demographics.annualIncome || ""}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid gap-3">
+                                        <div className="flex justify-between p-2 rounded bg-slate-50/50 border">
+                                            <span className="text-sm font-medium">Gender</span>
+                                            <span className="text-sm text-muted-foreground capitalize">{demographics.gender?.toLowerCase() || "Not set"}</span>
+                                        </div>
+                                        <div className="flex justify-between p-2 rounded bg-slate-50/50 border">
+                                            <span className="text-sm font-medium">Date of Birth</span>
+                                            <span className="text-sm text-muted-foreground">{demographics.dob || "Not set"}</span>
+                                        </div>
+                                        <div className="flex justify-between p-2 rounded bg-slate-50/50 border">
+                                            <span className="text-sm font-medium">Annual Income</span>
+                                            <span className="text-sm text-muted-foreground">{demographics.annualIncome || "Not set"}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <Separator className="my-6" />

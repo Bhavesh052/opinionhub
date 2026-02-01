@@ -7,14 +7,17 @@ import { z } from "zod";
 const UpdateProfileSchema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
     email: z.string().email({ message: "Invalid email" }),
+    gender: z.string().optional(),
+    dob: z.string().optional(),
+    annualIncome: z.string().optional(),
 });
-export const getUserRole = async(id:string) => {
+export const getUserRole = async (id: string) => {
     try {
-       const role= await db.user.findUnique({
-        where: { id },
-        select: { role: true }
-    });
-    return role;
+        const role = await db.user.findUnique({
+            where: { id },
+            select: { role: true }
+        });
+        return role;
     } catch (error) {
         logger.error("Get User Role Error", error);
         return null;
@@ -33,7 +36,7 @@ export const updateProfile = async (values: z.infer<typeof UpdateProfileSchema>)
         return { error: "Invalid fields!" };
     }
 
-    const { name, email } = validatedFields.data;
+    const { name, email, gender, dob, annualIncome } = validatedFields.data;
 
     // Optional: Check if email is already taken if it's changing
     if (email !== session.user.email) {
@@ -49,7 +52,15 @@ export const updateProfile = async (values: z.infer<typeof UpdateProfileSchema>)
     try {
         await db.user.update({
             where: { id: session.user.id },
-            data: { name, email },
+            data: {
+                name,
+                email,
+                demographics: {
+                    gender,
+                    dob,
+                    annualIncome
+                }
+            },
         });
 
         revalidatePath("/profile");
