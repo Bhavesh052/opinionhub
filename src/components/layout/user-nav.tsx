@@ -15,15 +15,12 @@ import { User } from "next-auth";
 import { logout } from "@/actions/logout";
 import { User as UserIcon, LogOut, LayoutDashboard, History as HistoryIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface UserNavProps {
     user: User;
 }
 
 export const UserNav = ({ user }: UserNavProps) => {
-    const router = useRouter();
-
     const handleLogout = async () => {
         await logout();
     };

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/layout/user-nav";
 import { User } from "next-auth";
@@ -11,7 +10,6 @@ interface NavbarClientProps {
 }
 
 export const NavbarClient = ({ user }: NavbarClientProps) => {
-    const pathname = usePathname();
     return (
         <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed top-0 w-full z-50">
             <div className="flex h-16 items-center px-4 md:px-8 max-w-7xl mx-auto justify-between">
